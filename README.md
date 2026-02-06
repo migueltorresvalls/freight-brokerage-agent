@@ -28,7 +28,7 @@ We utilize Nginx as a secure gateway to handle incoming traffic:
 2. The FastAPI application runs in an isolated Docker network (app-internal). It is exposed on port 8888 only to the proxy.
 
 ### Deployment
-1. Place your `fullchain.pem` and `privkey.pem` inside the ./reverse-proxy/ folder.
+1. Place your `fullchain.pem` and `privkey.pem` inside the `./reverse-proxy/` folder.
 2. Run: 
 ```bash
 docker compose up --build
@@ -64,3 +64,6 @@ The system automatically characterizes interactions into three states, reflected
 - Successful: Price agreement reached.
 - Unsuccessful: MC verified, but negotiation failed.
 - MC Invalid: Carrier identity could not be validated.
+
+![Dashboard Full View](images/dashboard_fullview.png)
+![Dashboard Detail View](images/dashboard_detailview.png)
