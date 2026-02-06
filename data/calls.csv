@@ -1,0 +1,4 @@
+outcome,load_id,agreed_rate,sentiment,date
+successful,1,2850.0,positive,Feb 5 9:05a.m.
+unsuccessful,5,0.0,negative,Feb 4 4:05p.m.
+successful,3,3200.0,positive,Feb 3 11:31a.m.

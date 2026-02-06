@@ -1,0 +1,38 @@
+services: 
+  api: 
+    container_name: api
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      network: host
+    volumes: 
+      - ./data:/app/data
+    networks: 
+      - app-internal
+    expose:
+      - 8888
+    environment:
+      - TF_VAR_authorization_bearer=3f1afe6a-932c-4d70-a35f-39c6f2439ec7 
+      - TF_VAR_fmcsa_api_key=cdc33e44d693a3a58451898d4ec9df862c65b954
+
+  reverse_proxy: 
+    image: nginx:latest
+    container_name: reverse_proxy
+    volumes:
+      - ./reverse-proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./reverse-proxy/fullchain.pem:/etc/nginx/proxy_fullchain.pem:ro
+    networks:
+      - app-internal
+    secrets:
+      - proxy_privkey
+    ports: 
+      - 80:80
+      - 443:443
+
+secrets:
+  proxy_privkey:
+    file: ./reverse-proxy/privkey.pem
+
+networks:
+  app-internal:
+    driver: bridge
