@@ -65,5 +65,8 @@ The system automatically characterizes interactions into three states, reflected
 - Unsuccessful: MC verified, but negotiation failed.
 - MC Invalid: Carrier identity could not be validated.
 
+Dashboard Full View:
 ![Dashboard Full View](images/dashboard_fullview.png)
+
+Dashboard Detailed View
 ![Dashboard Detail View](images/dashboard_detailview.png)
