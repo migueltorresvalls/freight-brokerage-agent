@@ -1,2 +1,4 @@
 *.pem
 env.sh
+docs/
+*.db
