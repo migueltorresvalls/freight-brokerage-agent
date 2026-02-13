@@ -22,6 +22,7 @@ class ClassifierRequest(BaseModel):
     agreed_rate: Optional[Union[float, str]] = 0.0
     call_outcome: str
     sentiment: str
+    mc_number: str
 
     @field_validator('load_id', mode='before')
     @classmethod
@@ -50,6 +51,7 @@ class CallResponse(BaseModel):
     agreed_rate: float
     sentiment: str
     timestamp: str
+    mc_number: Optional[str] = None
     origin: Optional[str] = None
     destination: Optional[str] = None
     pickup_datetime: Optional[str] = None

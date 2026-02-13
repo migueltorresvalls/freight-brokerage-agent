@@ -51,10 +51,18 @@ class LogisticsDB:
             load_id INTEGER,
             agreed_rate REAL,
             sentiment TEXT CHECK(sentiment IN ('positive', 'neutral', 'negative')),
+            mc_number TEXT,
             call_datetime TEXT,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )
         """)
+
+        # Aseguramos que la columna mc_number exista también en BDs antiguas
+        self.cursor.execute("PRAGMA table_info(calls)")
+        columns = [row[1] for row in self.cursor.fetchall()]
+        if "mc_number" not in columns:
+            self.cursor.execute("ALTER TABLE calls ADD COLUMN mc_number TEXT")
+
         self.conn.commit()
 
     def insert_load(self, data):
@@ -95,6 +103,7 @@ class LogisticsDB:
                 reader = csv.DictReader(f)
                 for row in reader:
                     try:
+                        # mc_number viene como string en el CSV, se almacena tal cual
                         row['load_id'] = int(row['load_id'])
                         row['agreed_rate'] = float(row['agreed_rate'])
                         row['call_datetime'] = row.get('date', 'N/A')
@@ -108,8 +117,8 @@ class LogisticsDB:
 
     def insert_call(self, data):
         query = """
-        INSERT INTO calls (outcome, load_id, agreed_rate, sentiment, call_datetime)
-        VALUES (:outcome, :load_id, :agreed_rate, :sentiment, :call_datetime)
+        INSERT INTO calls (outcome, load_id, agreed_rate, sentiment, mc_number, call_datetime)
+        VALUES (:outcome, :load_id, :agreed_rate, :sentiment, :mc_number, :call_datetime)
         """
         self.cursor.execute(query, data)
         self.conn.commit()

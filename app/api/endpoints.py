@@ -49,7 +49,14 @@ async def classify(data: ClassifierRequest, request: Request):
     am_pm = now.strftime("%p").lower().replace("am", "a.m.").replace("pm", "p.m.")
     call_datetime = f"{formatted_date}{am_pm}"
 
-    call_data = {"outcome": data.call_outcome, "load_id": int(data.load_id), "agreed_rate": float(data.agreed_rate), "sentiment": data.sentiment, "call_datetime": call_datetime}
+    call_data = {
+        "outcome": data.call_outcome,
+        "load_id": int(data.load_id),
+        "agreed_rate": float(data.agreed_rate),
+        "sentiment": data.sentiment,
+        "mc_number": data.mc_number,
+        "call_datetime": call_datetime,
+    }
 
     new_id = db.insert_call(call_data)
     return {"status": "success", "call_id": new_id}
