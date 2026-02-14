@@ -63,6 +63,15 @@ class LogisticsDB:
         if "mc_number" not in columns:
             self.cursor.execute("ALTER TABLE calls ADD COLUMN mc_number TEXT")
 
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS accounts (
+            username TEXT PRIMARY KEY,
+            email TEXT NOT NULL,
+            password TEXT NOT NULL,
+            salt TEXT NOT NULL
+        )
+        """)
+
         self.conn.commit()
 
     def insert_load(self, data):
@@ -79,7 +88,7 @@ class LogisticsDB:
         self.conn.commit()
         return self.cursor.lastrowid
 
-    def populate_from_csv(self, loads_csv, calls_csv):        
+    def populate_from_csv(self, loads_csv, calls_csv, accounts_csv=None):
         if os.path.exists(loads_csv):
             count_loads = 0
             with open(loads_csv, mode='r', encoding='utf-8') as f:
@@ -114,6 +123,63 @@ class LogisticsDB:
                         continue
             print(f"Successfully imported {count_calls} calls from {calls_csv}.")
         else: print(f"File {calls_csv} not found, skipping calls initialization.")
+
+        if accounts_csv and os.path.exists(accounts_csv):
+            self.cursor.execute("SELECT COUNT(*) FROM accounts")
+            if self.cursor.fetchone()[0] == 0:
+                count = 0
+                with open(accounts_csv, mode="r", encoding="utf-8") as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        try:
+                            self.cursor.execute(
+                                """
+                                INSERT OR REPLACE INTO accounts (username, email, password, salt)
+                                VALUES (:username, :email, :password, :salt)
+                                """,
+                                {
+                                    "username": row["username"].strip(),
+                                    "email": row["email"].strip(),
+                                    "password": row["password"].strip(),
+                                    "salt": row["salt"].strip(),
+                                },
+                            )
+                            count += 1
+                        except Exception:
+                            continue
+                self.conn.commit()
+                if count:
+                    print(f"Successfully imported {count} account(s) from {accounts_csv}.")
+        elif accounts_csv and not os.path.exists(accounts_csv):
+            print(f"File {accounts_csv} not found, skipping accounts initialization.")
+
+    def get_account_by_username(self, username):
+        self.cursor.execute(
+            "SELECT username, email, password, salt FROM accounts WHERE username = ?",
+            (username.strip(),),
+        )
+        row = self.cursor.fetchone()
+        if not row:
+            return None
+        return {
+            "username": row[0],
+            "email": row[1],
+            "password": row[2],
+            "salt": row[3],
+        }
+
+    def update_account(self, username, email=None, password_hash=None):
+        if email is not None:
+            self.cursor.execute(
+                "UPDATE accounts SET email = ? WHERE username = ?",
+                (email.strip(), username.strip()),
+            )
+        if password_hash is not None:
+            self.cursor.execute(
+                "UPDATE accounts SET password = ? WHERE username = ?",
+                (password_hash, username.strip()),
+            )
+        self.conn.commit()
 
     def insert_call(self, data):
         query = """

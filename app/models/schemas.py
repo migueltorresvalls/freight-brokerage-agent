@@ -1,6 +1,18 @@
 from pydantic import BaseModel, field_validator
 from typing import List, Optional, Union
 
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+class AccountUpdateRequest(BaseModel):
+    username: str
+    email: Optional[str] = None
+    new_password: Optional[str] = None
+    current_password: str
+
 class LoadResponse(BaseModel):
     load_id: int
     origin: str

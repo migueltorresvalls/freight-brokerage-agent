@@ -2,3 +2,5 @@
 env.sh
 docs/
 *.db
+.DS_Store
+*__pycache__/

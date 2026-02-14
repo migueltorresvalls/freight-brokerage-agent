@@ -1,12 +1,57 @@
 from fastapi import APIRouter, Request, HTTPException
-from app.models.schemas import LoadsListResponse, ClassifierRequest, CallsListResponse
+from app.models.schemas import (
+    LoadsListResponse,
+    ClassifierRequest,
+    CallsListResponse,
+    LoginRequest,
+    AccountUpdateRequest,
+)
 from app.core.config import format_location
 from app.core.security import check_authorization_bearer
 from datetime import datetime
+import hashlib
 
 import os
 
-router = APIRouter() 
+router = APIRouter()
+
+
+def _hash_password(password: str, salt: str) -> str:
+    return hashlib.md5((password + salt).encode("utf-8")).hexdigest()
+
+
+@router.post("/login", status_code=200)
+async def login(data: LoginRequest, request: Request):
+    db = request.app.state.db
+    account = db.get_account_by_username(data.username)
+    if not account:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    computed = _hash_password(data.password, account["salt"])
+    if computed != account["password"]:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    token = request.app.state.bearer_token
+    return {"token": token, "username": account["username"], "email": account["email"]}
+
+
+@router.put("/account", status_code=200)
+async def update_account(data: AccountUpdateRequest, request: Request):
+    if not check_authorization_bearer(request):
+        raise HTTPException(status_code=401, detail="Invalid token")
+    db = request.app.state.db
+    username = data.username.strip()
+    account = db.get_account_by_username(username)
+    if not account:
+        raise HTTPException(status_code=401, detail="Account not found")
+    if _hash_password(data.current_password, account["salt"]) != account["password"]:
+        raise HTTPException(status_code=401, detail="Contraseña actual incorrecta")
+    if data.email is not None:
+        db.update_account(username, email=data.email, password_hash=None)
+    if data.new_password:
+        new_salt = account["salt"]
+        new_hash = _hash_password(data.new_password, new_salt)
+        db.update_account(username, email=None, password_hash=new_hash)
+    updated = db.get_account_by_username(username)
+    return {"username": updated["username"], "email": updated["email"]} 
 
 @router.get("/authorize/{mc_number}", status_code=200)
 async def validate_mc(mc_number: str, request: Request):

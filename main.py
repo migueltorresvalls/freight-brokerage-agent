@@ -12,6 +12,7 @@ from fastapi.staticfiles import StaticFiles
 DB_PATH = "data/logistics.db"
 LOADS_CSV_PATH = "data/loads.csv"
 CALLS_CSV_PATH = "data/calls.csv"
+ACCOUNTS_CSV_PATH = "data/accounts.csv"
 
 FMCSA_KEY = os.environ.get("TF_VAR_fmcsa_api_key")
 EXPECTED_TOKEN = os.environ.get("TF_VAR_authorization_bearer")
@@ -20,7 +21,7 @@ db_file = os.path.exists(DB_PATH)
 db = LogisticsDB(DB_PATH)
 
 if not db_file:
-    db.populate_from_csv(LOADS_CSV_PATH, CALLS_CSV_PATH)
+    db.populate_from_csv(LOADS_CSV_PATH, CALLS_CSV_PATH, ACCOUNTS_CSV_PATH)
 
 fmcsa_client = FMCSAClient(web_key=FMCSA_KEY)
 

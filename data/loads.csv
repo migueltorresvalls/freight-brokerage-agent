@@ -1,7 +1,7 @@
 origin,destination,pickup_datetime,delivery_datetime,equipment_type,loadboard_rate,notes,weight,commodity_type,num_of_pieces,miles,dimensions
-"Laredo, TX","Chicago, IL","2026-02-10 08:00","2026-02-12 14:00","Dry Van 53'","2850.00","Carga delicada, requiere mantas",42000,"Auto Parts",24,1380,"Standard Pallets"
+"Laredo, TX","Chicago, IL","2026-02-13 08:00","2026-02-16 14:00","Dry Van 53'","2850.00","Carga delicada, requiere mantas",42000,"Auto Parts",24,1380,"Standard Pallets"
 "Savannah, GA","Atlanta, GA","2026-02-11 09:30","2026-02-11 16:00","Reefer","3100.00","Mantener a -18°C",38000,"Frozen Poultry",20,250,"40x48x60"
-"Houston, TX","Phoenix, AZ","2026-02-12 07:00","2026-02-14 10:00","Flatbed","3200.00","Carga sobredimensionada",45000,"Steel Pipes",12,1170,"40ft length"
+"Houston, TX","Phoenix, AZ","2026-02-13 07:00","2026-02-15 10:00","Flatbed","3200.00","Carga sobredimensionada",45000,"Steel Pipes",12,1170,"40ft length"
 "Miami, FL","Charlotte, NC","2026-02-13 10:00","2026-02-14 12:00","Dry Van 53'","1800.00","Solo carga trasera",15000,"Furniture",50,710,"Mixed boxes"
 "Los Angeles, CA","Seattle, WA","2026-02-15 06:00","2026-02-17 08:00","Reefer","2100.00","Fruta fresca, alta prioridad",35000,"Produce",22,1135,"Standard Pallets"
 "Dallas, TX","Denver, CO","2026-02-16 08:00","2026-02-17 15:00","Dry Van 53'","2400.00","Llegada antes del cierre",32000,"Electronics",18,795,"Standard Pallets"
