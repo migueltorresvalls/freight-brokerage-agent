@@ -133,7 +133,7 @@ function App() {
   const globalSatisfactionColor =
     globalSatisfaction >= 8 ? 'text-emerald-600' : globalSatisfaction >= 5 ? 'text-sky-600' : 'text-rose-600'
 
-  const negotiationBuckets = useMemo(() => computeNegotiationBuckets(calls), [calls])
+  const negotiationBuckets = useMemo(() => computeNegotiationBuckets(filteredCalls), [filteredCalls])
   const totalNegotiationCount = negotiationBuckets.reduce((sum, b) => sum + b.count, 0)
   const topCustomers = useMemo(() => computeTopCustomers(calls).slice(0, 3), [calls])
   const isDark = theme === 'dark'

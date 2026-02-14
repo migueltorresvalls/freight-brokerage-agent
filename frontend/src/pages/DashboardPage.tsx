@@ -102,7 +102,13 @@ export function DashboardPage({
               </div>
 
               <div className="mt-4 flex items-center gap-4">
-                <svg width={160} height={160} viewBox="0 0 160 160" className="shrink-0">
+                <svg
+                  key={`donut-${totalNegotiationCount}-${negotiationBuckets.map((b) => `${b.key}:${b.count}`).join(',')}`}
+                  width={160}
+                  height={160}
+                  viewBox="0 0 160 160"
+                  className="shrink-0"
+                >
                   {totalNegotiationCount === 0 ? (
                     <circle
                       cx={80}
@@ -114,18 +120,20 @@ export function DashboardPage({
                     />
                   ) : (
                     (() => {
+                      const radiusOuter = 70
+                      const radiusInner = 38
+                      const center = 80
+                      const fullCircle = Math.PI * 2
+                      const epsilon = 1e-6
                       let currentAngle = -Math.PI / 2
                       return negotiationBuckets.map((bucket, index) => {
                         if (bucket.count === 0) return null
-                        const sliceAngle = (bucket.count / totalNegotiationCount) * Math.PI * 2
+                        const sliceAngle = (bucket.count / totalNegotiationCount) * fullCircle
                         const startAngle = currentAngle
                         const endAngle = currentAngle + sliceAngle
                         currentAngle = endAngle
                         const color = DONUT_COLORS[index % DONUT_COLORS.length]
                         const largeArcFlag = sliceAngle > Math.PI ? 1 : 0
-                        const radiusOuter = 70
-                        const radiusInner = 38
-                        const center = 80
                         const x1Outer = center + radiusOuter * Math.cos(startAngle)
                         const y1Outer = center + radiusOuter * Math.sin(startAngle)
                         const x2Outer = center + radiusOuter * Math.cos(endAngle)
@@ -134,13 +142,31 @@ export function DashboardPage({
                         const y1Inner = center + radiusInner * Math.sin(endAngle)
                         const x2Inner = center + radiusInner * Math.cos(startAngle)
                         const y2Inner = center + radiusInner * Math.sin(startAngle)
-                        const d = [
-                          `M ${x1Outer} ${y1Outer}`,
-                          `A ${radiusOuter} ${radiusOuter} 0 ${largeArcFlag} 1 ${x2Outer} ${y2Outer}`,
-                          `L ${x1Inner} ${y1Inner}`,
-                          `A ${radiusInner} ${radiusInner} 0 ${largeArcFlag} 0 ${x2Inner} ${y2Inner}`,
-                          'Z',
-                        ].join(' ')
+                        let d: string
+                        if (sliceAngle >= fullCircle - epsilon) {
+                          const midAngle = startAngle + Math.PI
+                          const xMidOuter = center + radiusOuter * Math.cos(midAngle)
+                          const yMidOuter = center + radiusOuter * Math.sin(midAngle)
+                          const xMidInner = center + radiusInner * Math.cos(midAngle)
+                          const yMidInner = center + radiusInner * Math.sin(midAngle)
+                          d = [
+                            `M ${x1Outer} ${y1Outer}`,
+                            `A ${radiusOuter} ${radiusOuter} 0 1 1 ${xMidOuter} ${yMidOuter}`,
+                            `A ${radiusOuter} ${radiusOuter} 0 1 1 ${x1Outer} ${y1Outer}`,
+                            `L ${x2Inner} ${y2Inner}`,
+                            `A ${radiusInner} ${radiusInner} 0 1 0 ${xMidInner} ${yMidInner}`,
+                            `A ${radiusInner} ${radiusInner} 0 1 0 ${x2Inner} ${y2Inner}`,
+                            'Z',
+                          ].join(' ')
+                        } else {
+                          d = [
+                            `M ${x1Outer} ${y1Outer}`,
+                            `A ${radiusOuter} ${radiusOuter} 0 ${largeArcFlag} 1 ${x2Outer} ${y2Outer}`,
+                            `L ${x1Inner} ${y1Inner}`,
+                            `A ${radiusInner} ${radiusInner} 0 ${largeArcFlag} 0 ${x2Inner} ${y2Inner}`,
+                            'Z',
+                          ].join(' ')
+                        }
                         const isActive = negotiationBucketFilter === bucket.key
                         return (
                           <path
